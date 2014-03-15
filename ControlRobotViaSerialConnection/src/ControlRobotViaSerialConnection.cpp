@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : control-robot-by-serial-connection.cpp
+// Name        : ControlRobotViaSerialConnection.cpp
 // Author      : foreglance.com
 // Version     : 0.1
 // Copyright   : Copyright 2014

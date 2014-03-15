@@ -1,5 +1,5 @@
 /*
- * Connection.h
+ * SerialConnection.h
  *
  *  Created on: Mar 7, 2014
  *      Author: foreglance.com
