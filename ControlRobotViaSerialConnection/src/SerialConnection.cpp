@@ -69,13 +69,33 @@ void SerialConnection::configurePort(ActionResult* actionResult)
 		return;
 	}
 
-	cfsetispeed(&serialSettings, B9600);
-	cfsetospeed(&serialSettings, B9600);
+	setSettingsFlags(&serialSettings);
 
-	serialSettings.c_cflag &= ~PARENB; // no parity
-	serialSettings.c_cflag &= ~CSTOPB; //1 stop bit
-	serialSettings.c_cflag &= ~CSIZE; //data size...
-	serialSettings.c_cflag |= CS8; //...8 bits
-	tcflush(m_fd, TCIFLUSH);
-	tcsetattr(m_fd, TCSANOW, &serialSettings);
+	if(!applySettings(&serialSettings, actionResult))
+		return;
+}
+
+void SerialConnection::setSettingsFlags(struct termios* serialSettings){
+	serialSettings->c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+	serialSettings->c_oflag = 0;
+	serialSettings->c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+	serialSettings->c_cflag &= ~(CSIZE | PARENB);
+	serialSettings->c_cflag |= CS8;
+	serialSettings->c_cc[VMIN]  = 1;
+	serialSettings->c_cc[VTIME] = 0;
+}
+
+bool SerialConnection::setCommunicationSpeed(struct termios* serialSettings,  ActionResult* actionResult){
+	if(cfsetispeed(serialSettings, B9600) < 0
+	   || cfsetospeed(serialSettings, B9600) < 0)
+		return false;
+	actionResult->addError("Communication speed cannot be set");
+	return true;
+}
+
+bool SerialConnection::applySettings(struct termios* serialSettings,  ActionResult* actionResult){
+	if(tcsetattr(m_fd, TCSAFLUSH, serialSettings) >= 0)
+		return false;
+	actionResult->addError("Configuration cannot be applied");
+	return true;
 }

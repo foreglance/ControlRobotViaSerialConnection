@@ -9,11 +9,15 @@
 #define CONNECTION_H_
 #include "ActionResult.h"
 #include "ILogger.h"
+#include <termios.h>
 
 class SerialConnection {
 	int m_fd;
 	ILogger* m_logger;
 	void configurePort(ActionResult* actionResult);
+	void setSettingsFlags(struct termios* serialSettings);
+	bool setCommunicationSpeed(struct termios* serialSettings,  ActionResult* actionResult);
+	bool applySettings(struct termios* serialSettings,  ActionResult* actionResult);
 public:
 	static const int FAILED = -1;
 	SerialConnection(ILogger*);
